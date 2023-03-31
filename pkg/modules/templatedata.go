@@ -6,7 +6,7 @@ type TemplateData struct {
 	IntMap    map[string]int32
 	FloatMap  map[string]float32
 	Data      map[string]interface{}
-	CRFToken  string
+	CRFToken  string // Cross-Site Forgery Token
 	Flash     string
 	Warning   string
 	Error     string

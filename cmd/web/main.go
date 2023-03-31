@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/agoldust/go-course/pkg/config"
-	handler "github.com/agoldust/go-course/pkg/handlers"
+	"github.com/agoldust/go-course/pkg/handlers"
 	"github.com/agoldust/go-course/pkg/render"
 )
 
@@ -23,14 +23,22 @@ func main() {
 	app.TemplateCache = tc
 	app.UseCache = true
 
-	repo := handler.NewRepo(&app)
-	handler.NewHandlers(repo)
+	repo := handlers.NewRepo(&app)
+	handlers.NewHandlers(repo)
 
 	render.NewTemplate(&app)
 
-	http.HandleFunc("/", handler.Repo.Home)
-	http.HandleFunc("/about", handler.Repo.About)
+	//http.HandleFunc("/", handler.Repo.Home)
+	//http.HandleFunc("/about", handler.Repo.About)
 
 	log.Println("Starting Application on http://localhost:8080")
-	_ = http.ListenAndServe(portNumber, nil)
+	//_ = http.ListenAndServe(portNumber, nil)
+
+	srv := &http.Server{
+		Addr:    portNumber,
+		Handler: routes(&app),
+	}
+
+	err = srv.ListenAndServe()
+	log.Fatal(err)
 }
