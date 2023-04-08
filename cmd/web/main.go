@@ -3,19 +3,34 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/agoldust/go-course/pkg/config"
 	"github.com/agoldust/go-course/pkg/handlers"
 	"github.com/agoldust/go-course/pkg/render"
+	"github.com/alexedwards/scs/v2"
 )
 
 const portNumber = ":8080"
 
+var app config.AppConfig
+var session *scs.SessionManager
+
 // main main function of app
 func main() {
 	// getting Template Cache form disk
-	var app config.AppConfig
+	app.InProduction = false // change this to true when in production
 
+	// setting Session configs
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = app.InProduction
+
+	app.Session = session
+
+	// creating the template cache
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache!")
@@ -28,11 +43,7 @@ func main() {
 
 	render.NewTemplate(&app)
 
-	//http.HandleFunc("/", handler.Repo.Home)
-	//http.HandleFunc("/about", handler.Repo.About)
-
 	log.Println("Starting Application on http://localhost:8080")
-	//_ = http.ListenAndServe(portNumber, nil)
 
 	srv := &http.Server{
 		Addr:    portNumber,
