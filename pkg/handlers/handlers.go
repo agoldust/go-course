@@ -34,6 +34,11 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["page-title"] = "Home"
 
+	// adding test data to sessions
+	remoteIP := r.RemoteAddr
+	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
+
+	// rendering the template
 	render.RenderTemplate(w, "home.page.tmpl", &modules.TemplateData{
 		StringMap: stringMap,
 	})
@@ -44,6 +49,10 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	// perform some logic
 	stringMap := make(map[string]string)
 	stringMap["page-title"] = "About"
+
+	// adding test data from sessions
+	remoteIP := m.App.Session.GetString(r.Context(), "remote_ip")
+	stringMap["remote_ip"] = remoteIP
 
 	// send the data to the template
 	render.RenderTemplate(w, "about.page.tmpl", &modules.TemplateData{
